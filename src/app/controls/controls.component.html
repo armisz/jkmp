@@ -1,0 +1,4 @@
+<div>
+  <button class="btn btn-primary" type="button" [disabled]="!currentlyPlaying" (click)="onPauseOrResume()">{{ paused ? 'Play' : 'Pause'}}</button>
+  <button class="btn btn-primary" type="button" [disabled]="!currentlyPlaying"(click)="onStop()">Stop</button>
+</div>

@@ -1,0 +1,10 @@
+<ul *ngIf="currentDirectory">
+  <li *ngFor="let elm of currentDirectory.toc">
+    <div *ngIf="elm.filetype==='directory'; else is_file">
+      <a style="cursor: pointer;" (click)="onLoadDirectory(elm.file)">{{elm.label}}</a>
+      &nbsp;
+      <button class="btn btn-primary" type="button" (click)="onPlayDirectory(elm.file)">Play</button>
+    </div>
+    <ng-template #is_file>{{elm.label}}&nbsp;<button class="btn btn-primary" type="button" (click)="onPlayFile(elm.file)">Play</button></ng-template>
+  </li>
+</ul>

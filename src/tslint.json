@@ -12,6 +12,14 @@
             "element",
             "app",
             "kebab-case"
-        ]
+        ],
+      "no-console": [
+        false,
+        "debug",
+        "info",
+        "time",
+        "timeEnd",
+        "trace"
+      ]
     }
 }
