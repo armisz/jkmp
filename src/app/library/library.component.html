@@ -1,10 +1,24 @@
-<ul *ngIf="currentDirectory">
-  <li *ngFor="let elm of currentDirectory.toc">
-    <div *ngIf="elm.filetype==='directory'; else is_file">
-      <a style="cursor: pointer;" (click)="onLoadDirectory(elm.file)">{{elm.label}}</a>
-      &nbsp;
-      <button class="btn btn-primary" type="button" (click)="onPlayDirectory(elm.file)">Play</button>
-    </div>
-    <ng-template #is_file>{{elm.label}}&nbsp;<button class="btn btn-primary" type="button" (click)="onPlayFile(elm.file)">Play</button></ng-template>
-  </li>
-</ul>
+<div>
+  <mat-tree [dataSource]="this" [treeControl]="treeControl">
+
+    <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
+      <a [ngStyle]="getPlayableStyle(node)" (click)="onPlayFile(node)">
+        {{node.item['label'] | removeFileSuffix}}
+      </a>
+    </mat-tree-node>
+
+    <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding>
+      <button mat-icon-button matTreeNodeToggle>
+        <mat-icon class="mat-icon-rtl-mirror">
+          {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+        </mat-icon>
+      </button>
+
+      <a [ngStyle]="getPlayableStyle(node)" (click)="onPlayDirectory(node)">
+        {{node.item['label']}}
+      </a>
+
+      <mat-progress-bar *ngIf="node.isLoading" mode="indeterminate" class="library-tree-progress-bar"></mat-progress-bar>
+    </mat-tree-node>
+  </mat-tree>
+</div>

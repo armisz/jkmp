@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { KodiService } from './kodi.service';
+import {KodiService} from './kodi.service';
 
 describe('KodiService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

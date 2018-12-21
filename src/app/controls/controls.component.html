@@ -1,4 +1,36 @@
-<div>
-  <button class="btn btn-primary" type="button" [disabled]="!currentlyPlaying" (click)="onPauseOrResume()">{{ paused ? 'Play' : 'Pause'}}</button>
-  <button class="btn btn-primary" type="button" [disabled]="!currentlyPlaying"(click)="onStop()">Stop</button>
-</div>
+<mat-toolbar xmlns="http://www.w3.org/1999/html">
+  <mat-toolbar-row>
+    <button mat-stroked-button [disabled]="!isPlaying()" (click)="onGotoPrevious()">
+      <mat-icon>skip_previous</mat-icon>
+    </button>
+
+    <button mat-stroked-button [disabled]="!isPlaying()" (click)="onPauseOrResume()">
+      <mat-icon>{{ getPauseOrResumeIcon() }}</mat-icon>
+    </button>
+
+    <button mat-stroked-button [disabled]="!isPlaying()" (click)="onStop()">
+      <mat-icon>stop</mat-icon>
+    </button>
+
+    <button mat-stroked-button [disabled]="!isPlaying()" (click)="onGotoNext()">
+      <mat-icon>skip_next</mat-icon>
+    </button>
+  </mat-toolbar-row>
+
+  <mat-toolbar-row *ngIf="currentlyPlaying.file">
+    <span>{{currentlyPlaying.artist}}</span>
+
+    <div *ngIf="hasAlbum()">
+      <mat-icon>arrow_right</mat-icon>
+      <span>{{currentlyPlaying.album}}</span>
+    </div>
+
+    <mat-icon>arrow_right</mat-icon>
+    <span>{{currentlyPlaying.label}}</span>
+
+    <span class="toolbar-spacer"></span>
+    <span>{{currentlyPlaying.time.minutes | number: '2.0'}}:{{currentlyPlaying.time.seconds | number:'2.0'}}&nbsp;</span>
+    <mat-icon>access_time</mat-icon>
+    <span>&nbsp;{{currentlyPlaying.totaltime.minutes | number: '2.0'}}:{{currentlyPlaying.totaltime.seconds | number:'2.0'}}</span>
+  </mat-toolbar-row>
+</mat-toolbar>
