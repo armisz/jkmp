@@ -27,8 +27,9 @@
 
     <mat-icon>arrow_right</mat-icon>
     <span>{{currentlyPlaying.label}}</span>
+  </mat-toolbar-row>
 
-    <span class="toolbar-spacer"></span>
+  <mat-toolbar-row *ngIf="currentlyPlaying.file">
     <span>{{currentlyPlaying.time.minutes | number: '2.0'}}:{{currentlyPlaying.time.seconds | number:'2.0'}}&nbsp;</span>
     <mat-icon>access_time</mat-icon>
     <span>&nbsp;{{currentlyPlaying.totaltime.minutes | number: '2.0'}}:{{currentlyPlaying.totaltime.seconds | number:'2.0'}}</span>

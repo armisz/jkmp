@@ -52,8 +52,6 @@ export class KodiService implements OnDestroy {
       .jsonp(this.createRequestsUrl([playerProperties, playerItem]), 'callback')
       .pipe(takeUntil(this.unsubscribe))
       .subscribe((res: any) => {
-        console.debug(res);
-
         let playerItemInfo = {};
         if (res[1].result.item.file) {
           playerItemInfo = {
@@ -158,7 +156,7 @@ export class KodiService implements OnDestroy {
       id: this.requestId++,
       jsonrpc: '2.0'
     };
-    console.debug(request);
+    // console.debug(request);
     return request;
   }
 
