@@ -1,7 +1,10 @@
-mat-toolbar {
+.fixed-toolbar {
   height: 130px;
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   z-index: 100;
+  width: 100%  !important;
 }
 
 .toolbar-spacer {
