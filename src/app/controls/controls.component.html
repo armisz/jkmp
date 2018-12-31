@@ -21,10 +21,8 @@
     <span>{{currentlyPlaying.artist}}</span>
     <mat-icon>arrow_right</mat-icon>
 
-    <div *ngIf="hasAlbum()">
-      <span>{{currentlyPlaying.album}}</span>
-      <mat-icon>arrow_right</mat-icon>
-    </div>
+    <span *ngIf="hasAlbum()">{{currentlyPlaying.album}}</span>
+    <mat-icon *ngIf="hasAlbum()">arrow_right</mat-icon>
 
     <span>{{currentlyPlaying.label}}</span>
   </mat-toolbar-row>
