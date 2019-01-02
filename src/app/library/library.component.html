@@ -1,4 +1,4 @@
-<div>
+<mat-card>
   <mat-tree [dataSource]="this" [treeControl]="treeControl">
 
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
@@ -21,4 +21,4 @@
       <mat-progress-bar *ngIf="node.isLoading" mode="indeterminate" class="library-tree-progress-bar"></mat-progress-bar>
     </mat-tree-node>
   </mat-tree>
-</div>
+</mat-card>

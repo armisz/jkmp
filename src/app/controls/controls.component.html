@@ -1,4 +1,4 @@
-<mat-toolbar class="fixed-toolbar">
+<mat-toolbar class="toolbar-fixed">
   <mat-toolbar-row>
     <button mat-stroked-button [disabled]="!isPlaying()" (click)="onGotoPrevious()">
       <mat-icon>skip_previous</mat-icon>
@@ -17,19 +17,23 @@
     </button>
   </mat-toolbar-row>
 
-  <mat-toolbar-row *ngIf="currentlyPlaying.file">
-    <span>{{currentlyPlaying.artist}}</span>
-    <mat-icon>arrow_right</mat-icon>
+  <mat-toolbar-row>
+    <div *ngIf="currentlyPlaying.file">
+      <span>{{currentlyPlaying.artist}}</span>
+      <mat-icon>arrow_right</mat-icon>
 
-    <span *ngIf="hasAlbum()">{{currentlyPlaying.album}}</span>
-    <mat-icon *ngIf="hasAlbum()">arrow_right</mat-icon>
+      <span *ngIf="hasAlbum()">{{currentlyPlaying.album}}</span>
+      <mat-icon *ngIf="hasAlbum()">arrow_right</mat-icon>
 
-    <span>{{currentlyPlaying.label}}</span>
+      <span>{{currentlyPlaying.label}}</span>
+    </div>
   </mat-toolbar-row>
 
-  <mat-toolbar-row *ngIf="currentlyPlaying.file">
-    <span>{{currentlyPlaying.time.minutes | number: '2.0'}}:{{currentlyPlaying.time.seconds | number: '2.0'}}&nbsp;</span>
-    <mat-icon>access_time</mat-icon>
-    <span>&nbsp;{{currentlyPlaying.totaltime.minutes | number: '2.0'}}:{{currentlyPlaying.totaltime.seconds | number: '2.0'}}</span>
+  <mat-toolbar-row>
+    <div *ngIf="currentlyPlaying.file">
+      <span>{{currentlyPlaying.time.minutes | number: '2.0'}}:{{currentlyPlaying.time.seconds | number: '2.0'}}&nbsp;</span>
+      <mat-icon>access_time</mat-icon>
+      <span>&nbsp;{{currentlyPlaying.totaltime.minutes | number: '2.0'}}:{{currentlyPlaying.totaltime.seconds | number: '2.0'}}</span>
+    </div>
   </mat-toolbar-row>
 </mat-toolbar>
