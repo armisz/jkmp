@@ -82,26 +82,29 @@ export class LibraryComponent implements OnInit, OnDestroy {
     node.isLoading = true;
 
     this.getChildren(node.item.file)
-      .subscribe((children) => {
-        const index = this.treeData.indexOf(node);
-        if (!children || index < 0) { // If no children, or cannot find the node, no op
-          return;
-        }
-
-        if (expand) {
-          const nodes = children.toc.map(item => new DynamicFlatNode(item, node.level + 1, this.isExpandableItem(item)));
-          this.treeData.splice(index + 1, 0, ...nodes);
-        } else {
-          let count = 0;
-          for (let i = index + 1; i < this.treeData.length && this.treeData[i].level > node.level; i++, count++) {
+      .subscribe(
+        children => {
+          const index = this.treeData.indexOf(node);
+          if (!children || index < 0) { // If no children, or cannot find the node, no op
+            return;
           }
-          this.treeData.splice(index + 1, count);
-        }
 
-        // notify the change
-        this.treeDataChange.next(this.treeData);
-        node.isLoading = false;
-      });
+          if (expand) {
+            const nodes = children.toc.map(item => new DynamicFlatNode(item, node.level + 1, this.isExpandableItem(item)));
+            this.treeData.splice(index + 1, 0, ...nodes);
+          } else {
+            let count = 0;
+            for (let i = index + 1; i < this.treeData.length && this.treeData[i].level > node.level; i++, count++) {
+            }
+            this.treeData.splice(index + 1, count);
+          }
+
+          // notify the change
+          this.treeDataChange.next(this.treeData);
+          node.isLoading = false;
+        },
+        err => this.kodi.panic(err)
+      );
   }
 
   getLevel = (node: DynamicFlatNode) => node.level;
@@ -128,9 +131,10 @@ export class LibraryComponent implements OnInit, OnDestroy {
   private libraryInfoLoaded = (libraryInfo: any) => {
     this.libraryInfo = libraryInfo;
     this.getChildren(this.libraryInfo.file)
-      .subscribe((children: any) => {
-        this.treeData = children.toc.map(item => new DynamicFlatNode(item, 0, this.isExpandableItem(item)));
-      });
+      .subscribe(
+        (children: any) => this.treeData = children.toc.map(item => new DynamicFlatNode(item, 0, this.isExpandableItem(item))),
+        err => this.kodi.panic(err)
+      );
   }
 
   private playerPlaying = (file) => {

@@ -52,21 +52,24 @@ export class KodiService implements OnDestroy {
     this.httpClient
       .jsonp(this.createRequestsUrl([playerProperties, playerItem]), 'callback')
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe((res: any) => {
-        let playerItemInfo = {};
-        if (res[1].result.item.file) {
-          playerItemInfo = {
-            file: res[1].result.item.file,
-            label: res[1].result.item.label,
-            album: res[1].result.item.album,
-            artist: res[1].result.item.artist[0],
-            speed: res[0].result.speed,
-            time: res[0].result.time,
-            totaltime: res[0].result.totaltime,
-          };
-        }
-        this.playerChanged.next(playerItemInfo);
-      });
+      .subscribe(
+        (res: any) => {
+          let playerItemInfo = {};
+          if (res[1].result.item.file) {
+            playerItemInfo = {
+              file: res[1].result.item.file,
+              label: res[1].result.item.label,
+              album: res[1].result.item.album,
+              artist: res[1].result.item.artist[0],
+              speed: res[0].result.speed,
+              time: res[0].result.time,
+              totaltime: res[0].result.totaltime,
+            };
+          }
+          this.playerChanged.next(playerItemInfo);
+        },
+        err => this.panic(err)
+      );
   }
 
   loadDirectory(directory: string) {
@@ -102,18 +105,20 @@ export class KodiService implements OnDestroy {
     this.httpClient
       .jsonp(this.createRequestsUrl([clearPlaylist, insertIntoPlaylist, openPlayer]), 'callback')
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe(() => {
-        this.playerPlaying.next(url);
-      });
+      .subscribe(
+        () => this.playerPlaying.next(url),
+        err => this.panic(err)
+      );
   }
 
   pauseOrResume() {
     this.httpClient
       .jsonp(this.createRequestUrl('Player.PlayPause', {playerid: 0, play: 'toggle'}), 'callback')
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe((res: any) => {
-        this.playerSpeedChanged.next(res.result.speed);
-      });
+      .subscribe(
+        (res: any) => this.playerSpeedChanged.next(res.result.speed),
+        err => this.panic(err)
+      );
   }
 
   stop() {
@@ -122,9 +127,10 @@ export class KodiService implements OnDestroy {
     this.httpClient
       .jsonp(this.createRequestsUrl([stopPlayer, clearPlaylist]), 'callback')
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe(() => {
-        this.playerStopped.next();
-      });
+      .subscribe(
+        () => this.playerStopped.next(),
+        err => this.panic(err)
+      );
   }
 
   gotoPrevious() {
@@ -139,7 +145,11 @@ export class KodiService implements OnDestroy {
     this.httpClient
       .jsonp(this.createRequestUrl('Player.GoTo', {playerid: 0, to: where}), 'callback')
       .pipe(takeUntil(this.unsubscribe))
-      .subscribe();
+      .subscribe(
+        () => {
+        },
+        err => this.panic(err)
+      );
   }
 
   private createRequestUrl(method: string, params: any) {
@@ -159,6 +169,10 @@ export class KodiService implements OnDestroy {
     };
     // console.debug(request);
     return request;
+  }
+
+  panic = (err) => {
+    console.error(err);
   }
 
 }
