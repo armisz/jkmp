@@ -139,15 +139,15 @@ export class LibraryComponent implements OnInit, OnDestroy {
 
   private playerPlaying = (file) => {
     this.currentlyPlaying = file;
-  };
+  }
 
   private playerStopped = () => {
     this.currentlyPlaying = '';
-  };
+  }
 
   private playerChanged = (data: any) => {
     this.currentlyPlaying = data.file;
-  };
+  }
 
   getPlayableItemStyle(node: DynamicFlatNode) {
     const isPlaying = this.currentlyPlaying === node.item.file;
