@@ -39,15 +39,7 @@ export class LibraryComponent implements OnInit, OnDestroy {
     this.kodi.playerStopped.pipe(takeUntil(this.unsubscribe)).subscribe(this.playerStopped);
     this.kodi.playerChanged.pipe(takeUntil(this.unsubscribe)).subscribe(this.playerChanged);
 
-    this.kodi.loadLibraryInfo()
-      .pipe(takeUntil(this.unsubscribe))
-      .subscribe((libraryInfo) => {
-        this.libraryInfo = libraryInfo;
-        this.getChildren(this.libraryInfo.file)
-          .subscribe((children: any) => {
-            this.treeData = children.toc.map(item => new DynamicFlatNode(item, 0, this.isExpandableItem(item)));
-          });
-      });
+    this.kodi.loadLibraryInfo().pipe(takeUntil(this.unsubscribe)).subscribe(this.libraryInfoLoaded);
   }
 
   ngOnDestroy() {
@@ -133,6 +125,14 @@ export class LibraryComponent implements OnInit, OnDestroy {
     this.kodi.playDirectory(node.item.file);
   }
 
+  private libraryInfoLoaded = (libraryInfo: any) => {
+    this.libraryInfo = libraryInfo;
+    this.getChildren(this.libraryInfo.file)
+      .subscribe((children: any) => {
+        this.treeData = children.toc.map(item => new DynamicFlatNode(item, 0, this.isExpandableItem(item)));
+      });
+  }
+
   private playerPlaying = (file) => {
     this.currentlyPlaying = file;
   };
@@ -145,7 +145,7 @@ export class LibraryComponent implements OnInit, OnDestroy {
     this.currentlyPlaying = data.file;
   };
 
-  getPlayableStyle(node: DynamicFlatNode) {
+  getPlayableItemStyle(node: DynamicFlatNode) {
     const isPlaying = this.currentlyPlaying === node.item.file;
     return {
       'cursor': 'pointer',

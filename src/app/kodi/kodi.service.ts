@@ -8,7 +8,7 @@ import {map, takeUntil} from 'rxjs/operators';
 })
 export class KodiService implements OnDestroy {
 
-  private static KODI_URL = 'http://192.168.1.3:8080/jsonrpc';
+  private static KODI_URL = 'http://192.168.1.3/jsonrpc';
   private static PLAYER_POLL_INTERVAL = 5000;  // ms
 
   private requestId = 1;
@@ -38,9 +38,10 @@ export class KodiService implements OnDestroy {
     return this.httpClient
       .jsonp(this.createRequestUrl('Files.GetSources', {media: 'music'}), 'callback')
       .pipe(map((res: any) => {
+        const library = res.result.sources.filter((source: any) => source.file.startsWith('nfs://'))[0];
         return {
-          file: res.result.sources[0].file,
-          name: res.result.sources[0].label
+          file: library.file,
+          name: library.label
         };
       }));
   }

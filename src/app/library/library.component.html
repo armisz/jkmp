@@ -2,7 +2,7 @@
   <mat-tree [dataSource]="this" [treeControl]="treeControl">
 
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding>
-      <a [ngStyle]="getPlayableStyle(node)" (click)="onPlayFile(node)">
+      <a [ngStyle]="getPlayableItemStyle(node)" (click)="onPlayFile(node)">
         {{node.item['label'] | removeFileSuffix}}
       </a>
     </mat-tree-node>
@@ -14,7 +14,7 @@
         </mat-icon>
       </button>
 
-      <a [ngStyle]="getPlayableStyle(node)" (click)="onPlayDirectory(node)">
+      <a [ngStyle]="getPlayableItemStyle(node)" (click)="onPlayDirectory(node)">
         {{node.item['label']}}
       </a>
 
