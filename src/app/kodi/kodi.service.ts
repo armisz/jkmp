@@ -1,5 +1,5 @@
 import {Injectable, OnDestroy} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {Subject} from 'rxjs';
 import {map, takeUntil} from 'rxjs/operators';
 
@@ -9,7 +9,12 @@ import {map, takeUntil} from 'rxjs/operators';
 export class KodiService implements OnDestroy {
 
   private static KODI_URL = 'http://192.168.1.3/jsonrpc';
-  private static PLAYER_POLL_INTERVAL = 5000;  // ms
+  private static PLAYER_POLL_INTERVAL_MS = 5000;
+  private static HTTP_OPTIONS = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+    })
+  };
 
   private requestId = 1;
   private unsubscribe: Subject<void> = new Subject();
@@ -23,7 +28,7 @@ export class KodiService implements OnDestroy {
   constructor(private httpClient: HttpClient) {
     this.interval = setInterval(() => {
       this.pollPlayer();
-    }, KodiService.PLAYER_POLL_INTERVAL);
+    }, KodiService.PLAYER_POLL_INTERVAL_MS);
   }
 
   ngOnDestroy() {
@@ -36,7 +41,7 @@ export class KodiService implements OnDestroy {
 
   loadLibraryInfo() {
     return this.httpClient
-      .jsonp(this.createRequestUrl('Files.GetSources', {media: 'music'}), 'callback')
+      .jsonp(this.createJsonpRequestUrl('Files.GetSources', {media: 'music'}), 'callback')
       .pipe(map((res: any) => {
         const library = res.result.sources.filter((source: any) => source.file.startsWith('nfs://'))[0];
         return {
@@ -47,10 +52,10 @@ export class KodiService implements OnDestroy {
   }
 
   private pollPlayer() {
-    const playerProperties = this.createRequest('Player.GetProperties', {playerid: 0, properties: ['speed', 'time', 'totaltime']});
-    const playerItem = this.createRequest('Player.GetItem', {playerid: 0, properties: ['file', 'album', 'artist']});
+    const playerProperties = this.createJsonRpcRequest('Player.GetProperties', {playerid: 0, properties: ['speed', 'time', 'totaltime']});
+    const playerItem = this.createJsonRpcRequest('Player.GetItem', {playerid: 0, properties: ['file', 'album', 'artist']});
     this.httpClient
-      .jsonp(this.createRequestsUrl([playerProperties, playerItem]), 'callback')
+      .jsonp(this.createJsonpRequestsUrl([playerProperties, playerItem]), 'callback')
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(
         (res: any) => {
@@ -80,7 +85,7 @@ export class KodiService implements OnDestroy {
     };
 
     return this.httpClient
-      .jsonp(this.createRequestUrl('Files.GetDirectory', params), 'callback')
+      .jsonp(this.createJsonpRequestUrl('Files.GetDirectory', params), 'callback')
       .pipe(map((res: any) => {
         return {
           url: directory,
@@ -98,12 +103,12 @@ export class KodiService implements OnDestroy {
   }
 
   private play(url: string, playlistItem: any) {
-    const clearPlaylist = this.createRequest('Playlist.Clear', {playlistid: 0});
-    const insertIntoPlaylist = this.createRequest('Playlist.Insert', {playlistid: 0, position: 0, item: playlistItem});
-    const openPlayer = this.createRequest('Player.Open', {item: {playlistid: 0, position: 0}, options: {}});
+    const clearPlaylist = this.createJsonRpcRequest('Playlist.Clear', {playlistid: 0});
+    const insertIntoPlaylist = this.createJsonRpcRequest('Playlist.Insert', {playlistid: 0, position: 0, item: playlistItem});
+    const openPlayer = this.createJsonRpcRequest('Player.Open', {item: {playlistid: 0, position: 0}, options: {}});
 
     this.httpClient
-      .jsonp(this.createRequestsUrl([clearPlaylist, insertIntoPlaylist, openPlayer]), 'callback')
+      .post(KodiService.KODI_URL, [clearPlaylist, insertIntoPlaylist, openPlayer].join(','), KodiService.HTTP_OPTIONS)
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(
         () => this.playerPlaying.next(url),
@@ -113,7 +118,7 @@ export class KodiService implements OnDestroy {
 
   pauseOrResume() {
     this.httpClient
-      .jsonp(this.createRequestUrl('Player.PlayPause', {playerid: 0, play: 'toggle'}), 'callback')
+      .post(KodiService.KODI_URL, this.createJsonRpcRequest('Player.PlayPause', {playerid: 0, play: 'toggle'}), KodiService.HTTP_OPTIONS)
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(
         (res: any) => this.playerSpeedChanged.next(res.result.speed),
@@ -122,10 +127,10 @@ export class KodiService implements OnDestroy {
   }
 
   stop() {
-    const stopPlayer = this.createRequest('Player.Stop', {playerid: 0});
-    const clearPlaylist = this.createRequest('Playlist.Clear', {playlistid: 0});
+    const stopPlayer = this.createJsonRpcRequest('Player.Stop', {playerid: 0});
+    const clearPlaylist = this.createJsonRpcRequest('Playlist.Clear', {playlistid: 0});
     this.httpClient
-      .jsonp(this.createRequestsUrl([stopPlayer, clearPlaylist]), 'callback')
+      .post(KodiService.KODI_URL, [stopPlayer, clearPlaylist].join(','), KodiService.HTTP_OPTIONS)
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(
         () => this.playerStopped.next(),
@@ -143,7 +148,7 @@ export class KodiService implements OnDestroy {
 
   private goto(where: string) {
     this.httpClient
-      .jsonp(this.createRequestUrl('Player.GoTo', {playerid: 0, to: where}), 'callback')
+      .post(KodiService.KODI_URL, this.createJsonRpcRequest('Player.GoTo', {playerid: 0, to: where}), KodiService.HTTP_OPTIONS)
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(
         () => {
@@ -152,23 +157,21 @@ export class KodiService implements OnDestroy {
       );
   }
 
-  private createRequestUrl(method: string, params: any) {
-    return KodiService.KODI_URL + '?request=' + JSON.stringify(this.createRequest(method, params));
+  private createJsonpRequestUrl(method: string, params: any) {
+    return KodiService.KODI_URL + '?request=' + JSON.stringify(this.createJsonRpcRequest(method, params));
   }
 
-  private createRequestsUrl(requests: any[]) {
-    return KodiService.KODI_URL + '?request=' + JSON.stringify(requests);
+  private createJsonpRequestsUrl(jsonRpcRequests: any[]) {
+    return KodiService.KODI_URL + '?request=' + JSON.stringify(jsonRpcRequests);
   }
 
-  private createRequest(method: string, params: any) {
-    const request = {
+  private createJsonRpcRequest(method: string, params: any) {
+    return {
       method: method,
       params: params,
       id: this.requestId++,
       jsonrpc: '2.0'
     };
-    // console.debug(request);
-    return request;
   }
 
   panic = (err) => {

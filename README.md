@@ -2,7 +2,11 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
-[Kodi - JSON-RPC API/v8](https://kodi.wiki/view/JSON-RPC_API/v8)
+## Kodi
+
+* [Kodi - JSON-RPC API/v9](https://kodi.wiki/view/JSON-RPC_API/v9)
+* [JSON-RPC no longer accepts many of the commands via HTTP](https://forum.kodi.tv/showthread.php?tid=324598)
+* [CORS troubles](https://forum.kodi.tv/showthread.php?tid=239965)
 
 ## Development server
 
