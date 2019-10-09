@@ -2,11 +2,15 @@
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.1.2.
 
+## Status
+
+Reading data from the Kodi player (directories, songs, player status) works. Modifications (insert songs, play, stop, pause) fail.
+
+Starting with Kodi 18 Leia, trying to call a modifying JSON-RPC method the following error will be returned: `Bad client permission.` [(JSON-RPC no longer accepts many of the commands via HTTP)](https://forum.kodi.tv/showthread.php?tid=324598). Changing these calls to use POST fails, too, due to [CORS problems](https://forum.kodi.tv/showthread.php?tid=239965).
+
 ## Kodi
 
 * [Kodi - JSON-RPC API/v9](https://kodi.wiki/view/JSON-RPC_API/v9)
-* [JSON-RPC no longer accepts many of the commands via HTTP](https://forum.kodi.tv/showthread.php?tid=324598)
-* [CORS troubles](https://forum.kodi.tv/showthread.php?tid=239965)
 
 ## Development server
 
