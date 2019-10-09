@@ -40,8 +40,9 @@ export class KodiService implements OnDestroy {
   }
 
   loadLibraryInfo() {
+    const musicSources = this.createJsonRpcRequest('Files.GetSources', {media: 'music'});
     return this.httpClient
-      .jsonp(this.createJsonpRequestUrl('Files.GetSources', {media: 'music'}), 'callback')
+      .jsonp(this.createJsonpRequestUrl(musicSources), 'callback')
       .pipe(map((res: any) => {
         const library = res.result.sources.filter((source: any) => source.file.startsWith('nfs://'))[0];
         return {
@@ -55,7 +56,7 @@ export class KodiService implements OnDestroy {
     const playerProperties = this.createJsonRpcRequest('Player.GetProperties', {playerid: 0, properties: ['speed', 'time', 'totaltime']});
     const playerItem = this.createJsonRpcRequest('Player.GetItem', {playerid: 0, properties: ['file', 'album', 'artist']});
     this.httpClient
-      .jsonp(this.createJsonpRequestsUrl([playerProperties, playerItem]), 'callback')
+      .jsonp(this.createJsonpRequestUrl([playerProperties, playerItem]), 'callback')
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(
         (res: any) => {
@@ -78,14 +79,14 @@ export class KodiService implements OnDestroy {
   }
 
   loadDirectory(directory: string) {
-    const params = {
+    const musicDirectories = this.createJsonRpcRequest('Files.GetDirectory', {
       directory: directory,
       media: 'music',
       sort: {method: 'label', order: 'ascending'}
-    };
+    });
 
     return this.httpClient
-      .jsonp(this.createJsonpRequestUrl('Files.GetDirectory', params), 'callback')
+      .jsonp(this.createJsonpRequestUrl(musicDirectories), 'callback')
       .pipe(map((res: any) => {
         return {
           url: directory,
@@ -117,8 +118,9 @@ export class KodiService implements OnDestroy {
   }
 
   pauseOrResume() {
+    const togglePlayer = this.createJsonRpcRequest('Player.PlayPause', {playerid: 0, play: 'toggle'});
     this.httpClient
-      .post(KodiService.KODI_URL, this.createJsonRpcRequest('Player.PlayPause', {playerid: 0, play: 'toggle'}), KodiService.HTTP_OPTIONS)
+      .post(KodiService.KODI_URL, togglePlayer, KodiService.HTTP_OPTIONS)
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(
         (res: any) => this.playerSpeedChanged.next(res.result.speed),
@@ -147,8 +149,9 @@ export class KodiService implements OnDestroy {
   }
 
   private goto(where: string) {
+    const gotoPlayer = this.createJsonRpcRequest('Player.GoTo', {playerid: 0, to: where});
     this.httpClient
-      .post(KodiService.KODI_URL, this.createJsonRpcRequest('Player.GoTo', {playerid: 0, to: where}), KodiService.HTTP_OPTIONS)
+      .post(KodiService.KODI_URL, gotoPlayer, KodiService.HTTP_OPTIONS)
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(
         () => {
@@ -157,12 +160,8 @@ export class KodiService implements OnDestroy {
       );
   }
 
-  private createJsonpRequestUrl(method: string, params: any) {
-    return KodiService.KODI_URL + '?request=' + JSON.stringify(this.createJsonRpcRequest(method, params));
-  }
-
-  private createJsonpRequestsUrl(jsonRpcRequests: any[]) {
-    return KodiService.KODI_URL + '?request=' + JSON.stringify(jsonRpcRequests);
+  private createJsonpRequestUrl(jsonRpcRequest: any) {
+    return KodiService.KODI_URL + '?request=' + JSON.stringify(jsonRpcRequest);
   }
 
   private createJsonRpcRequest(method: string, params: any) {
@@ -176,6 +175,6 @@ export class KodiService implements OnDestroy {
 
   panic = (err) => {
     console.error(err);
-  }
+  };
 
 }
