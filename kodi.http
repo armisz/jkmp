@@ -1,0 +1,292 @@
+### Bibliothek
+POST http://192.168.1.3/jsonrpc
+Content-Type: application/json
+
+{
+  "method": "Files.GetSources",
+  "params": [
+    "music"
+  ],
+  "jsonrpc": "2.0",
+  "id": 1
+}
+
+### Verzeichnisse
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+{
+  "method": "Files.GetDirectory",
+  "params": {
+    "directory": "nfs://192.168.1.2/volume1/music/Dire Straits/Brothers In Arms",
+    "media": "music",
+    "properties": [
+      "file",
+      "title"
+    ],
+    "sort": {
+      "method": "label",
+      "order": "ascending"
+    }
+  },
+  "jsonrpc": "2.0",
+  "id": 1
+}
+
+### Playlist Clear
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+[
+  {
+    "method": "Playlist.Clear",
+    "params": {
+      "playlistid": 0
+    },
+    "jsonrpc": "2.0",
+    "id": 1
+  }
+]
+
+### Playlist Insert Song
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+[
+  {
+    "method": "Playlist.Insert",
+    "params": {
+      "playlistid": 0,
+      "position": 0,
+      "item": {
+        "file": "nfs://192.168.1.2/volume1/music/Dire Straits/Brothers In Arms/09 Brothers In Arms.m4a"
+      }
+    },
+    "jsonrpc": "2.0",
+    "id": 1
+  }
+]
+
+### Playlist Insert Album
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+[
+  {
+    "method": "Playlist.Insert",
+    "params": {
+      "playlistid": 0,
+      "position": 0,
+      "item": {
+        "directory": "nfs://192.168.1.2/volume1/music/Dire Straits/Brothers In Arms/"
+      }
+    },
+    "jsonrpc": "2.0",
+    "id": 1
+  }
+]
+
+### Play
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+[
+  {
+    "method": "Player.Open",
+    "params": {
+      "item": {
+        "position": 0,
+        "playlistid": 0
+      },
+      "options": {}
+    },
+    "jsonrpc": "2.0",
+    "id": 1
+  }
+]
+
+### Play (alles zusammen)
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+[
+  {
+    "method": "Playlist.Clear",
+    "params": {
+      "playlistid": 0
+    },
+    "jsonrpc": "2.0",
+    "id": 1
+  },
+  {
+    "method": "Playlist.Insert",
+    "params": {
+      "playlistid": 0,
+      "position": 0,
+      "item": {
+        "directory": "nfs://192.168.1.2/volume1/music/Dire Straits/Brothers In Arms/"
+      }
+    },
+    "jsonrpc": "2.0",
+    "id": 2
+  },
+  {
+    "method": "Player.Open",
+    "params": {
+      "item": {
+        "position": 0,
+        "playlistid": 0
+      },
+      "options": {}
+    },
+    "jsonrpc": "2.0",
+    "id": 3
+  }
+]
+
+### Stop
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+[
+  {
+    "method": "Player.Stop",
+    "params": {
+      "playerid": 0
+    },
+    "jsonrpc": "2.0",
+    "id": 1
+  }
+]
+
+### Pause / Resume
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+[
+  {
+    "method": "Player.PlayPause",
+    "params": {
+      "playerid": 0,
+      "play": "toggle"
+    },
+    "jsonrpc": "2.0",
+    "id": 1
+  }
+]
+
+### Goto next
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+[
+  {
+    "method": "Player.GoTo",
+    "params": {
+      "playerid": 0,
+      "to": "next"
+    },
+    "jsonrpc": "2.0",
+    "id": 1
+  }
+]
+
+### Goto previous
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+[
+  {
+    "method": "Player.GoTo",
+    "params": {
+      "playerid": 0,
+      "to": "previous"
+    },
+    "jsonrpc": "2.0",
+    "id": 1
+  }
+]
+
+### Get Player Item
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+{
+  "method": "Player.GetItem",
+  "params": {
+    "playerid": 0,
+    "properties": [
+      "file",
+      "album",
+      "artist"
+    ]
+  },
+  "jsonrpc": "2.0",
+  "id": 1
+}
+
+### Get Player Properties
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+{
+  "method": "Player.GetProperties",
+  "params": {
+    "playerid": 0,
+    "properties": [
+      "speed",
+      "time",
+      "totaltime"
+    ]
+  },
+  "jsonrpc": "2.0",
+  "id": 1
+}
+
+### Get Player (alles zusammen)
+POST http://192.168.1.3/jsonrpc
+cache-control: no-cache
+Content-Type: application/json
+
+[
+  {
+    "method": "Player.GetItem",
+    "params": {
+      "playerid": 0,
+      "properties": [
+        "file",
+        "album",
+        "artist"
+      ]
+    },
+    "jsonrpc": "2.0",
+    "id": 1
+  },
+  {
+    "method": "Player.GetProperties",
+    "params": {
+      "playerid": 0,
+      "properties": [
+        "speed",
+        "time",
+        "totaltime"
+      ]
+    },
+    "jsonrpc": "2.0",
+    "id": 2
+  }
+]
+
+###
