@@ -42,7 +42,7 @@ export class KodiService implements OnDestroy {
   loadLibraryInfo() {
     const musicSources = this.createJsonRpcRequest('Files.GetSources', {media: 'music'});
     return this.httpClient
-      .jsonp(this.createJsonpRequestUrl(musicSources), 'callback')
+      .post(KodiService.KODI_URL, musicSources, KodiService.HTTP_OPTIONS)
       .pipe(map((res: any) => {
         const library = res.result.sources.filter((source: any) => source.file.startsWith('nfs://'))[0];
         return {
@@ -56,7 +56,7 @@ export class KodiService implements OnDestroy {
     const playerProperties = this.createJsonRpcRequest('Player.GetProperties', {playerid: 0, properties: ['speed', 'time', 'totaltime']});
     const playerItem = this.createJsonRpcRequest('Player.GetItem', {playerid: 0, properties: ['file', 'album', 'artist']});
     this.httpClient
-      .jsonp(this.createJsonpRequestUrl([playerProperties, playerItem]), 'callback')
+      .post(KodiService.KODI_URL, [playerProperties, playerItem].join(','), KodiService.HTTP_OPTIONS)
       .pipe(takeUntil(this.unsubscribe))
       .subscribe(
         (res: any) => {
@@ -86,7 +86,7 @@ export class KodiService implements OnDestroy {
     });
 
     return this.httpClient
-      .jsonp(this.createJsonpRequestUrl(musicDirectories), 'callback')
+      .post(KodiService.KODI_URL, musicDirectories, KodiService.HTTP_OPTIONS)
       .pipe(map((res: any) => {
         return {
           url: directory,
@@ -160,10 +160,6 @@ export class KodiService implements OnDestroy {
       );
   }
 
-  private createJsonpRequestUrl(jsonRpcRequest: any) {
-    return KodiService.KODI_URL + '?request=' + JSON.stringify(jsonRpcRequest);
-  }
-
   private createJsonRpcRequest(method: string, params: any) {
     return {
       method: method,
@@ -175,6 +171,6 @@ export class KodiService implements OnDestroy {
 
   panic = (err) => {
     console.error(err);
-  };
+  }
 
 }
